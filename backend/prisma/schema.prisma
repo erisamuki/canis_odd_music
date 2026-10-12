@@ -1,0 +1,160 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  MOBILE_MONEY
+  CARD
+}
+
+enum UserRole {
+  ADMIN
+  STAFF
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         UserRole @default(STAFF)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  bookings     Booking[]
+}
+
+model Music {
+  id          Int      @id @default(autoincrement())
+  title       String
+  artist      String?
+  description String?
+  coverImage  String?
+  audioUrl    String
+  price       Int      @default(700)
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  payments    Payment[]
+  downloads   Download[]
+}
+
+model Video {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  thumbnail   String?
+  videoUrl    String
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Booking {
+  id          Int           @id @default(autoincrement())
+  name        String
+  email       String
+  phone       String
+  eventDate   DateTime
+  eventType   String
+  location    String
+  message     String?
+  status      BookingStatus @default(PENDING)
+  userId      Int?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  user        User?         @relation(fields: [userId], references: [id])
+}
+
+model Payment {
+  id          Int           @id @default(autoincrement())
+  amount      Int
+  method      PaymentMethod
+  status      PaymentStatus @default(PENDING)
+  reference   String?       @unique
+  phone       String?
+  email       String?
+  musicId     Int?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  music       Music?        @relation(fields: [musicId], references: [id])
+  downloads   Download[]
+  donations   Donation[]
+}
+
+model Download {
+  id          Int      @id @default(autoincrement())
+  musicId     Int
+  paymentId   Int
+  downloadKey String   @unique
+  expiresAt   DateTime?
+  downloadedAt DateTime?
+  createdAt   DateTime @default(now())
+
+  music       Music    @relation(fields: [musicId], references: [id])
+  payment     Payment  @relation(fields: [paymentId], references: [id])
+}
+
+model Donation {
+  id          Int      @id @default(autoincrement())
+  amount      Int
+  name        String?
+  email       String?
+  message     String?
+  paymentId   Int?
+  createdAt   DateTime @default(now())
+
+  payment     Payment? @relation(fields: [paymentId], references: [id])
+}
+
+model Slider {
+  id          Int      @id @default(autoincrement())
+  title       String
+  subtitle    String?
+  imageUrl    String
+  buttonText  String?
+  buttonUrl   String?
+  isPublished Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model SocialLink {
+  id        Int      @id @default(autoincrement())
+  platform  String
+  url       String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SiteSetting {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
