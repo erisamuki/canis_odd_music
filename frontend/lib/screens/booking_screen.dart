@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../services/api_service.dart';
+import '../widgets/site_background.dart';
 
 class BookingScreen extends StatefulWidget {
   const BookingScreen({super.key});
@@ -163,8 +164,7 @@ class _BookingScreenState extends State<BookingScreen> {
   }) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        backgroundColor:
-            isError ? Colors.red.shade700 : Colors.black,
+        backgroundColor: isError ? Colors.red.shade700 : Colors.black,
         content: Text(
           message,
           style: const TextStyle(
@@ -246,274 +246,238 @@ class _BookingScreenState extends State<BookingScreen> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 24,
-          vertical: 40,
-        ),
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(
-              maxWidth: 850,
-            ),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Booking',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 40,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    'Send a booking request to Canis Odd.',
-                    style: TextStyle(
-                      color: Colors.black54,
-                      fontSize: 17,
-                    ),
-                  ),
-                  const SizedBox(height: 35),
-
-                  TextFormField(
-                    controller: _nameController,
-                    style: const TextStyle(
-                      color: Colors.black,
-                    ),
-                    textInputAction:
-                        TextInputAction.next,
-                    decoration: _inputDecoration(
-                      label: 'Name',
-                      hint: 'Your full name',
-                    ),
-                    validator: (value) {
-                      if (value == null ||
-                          value.trim().isEmpty) {
-                        return 'Please enter your name.';
-                      }
-                      return null;
-                    },
-                  ),
-
-                  const SizedBox(height: 18),
-
-                  TextFormField(
-                    controller: _emailController,
-                    style: const TextStyle(
-                      color: Colors.black,
-                    ),
-                    keyboardType:
-                        TextInputType.emailAddress,
-                    textInputAction:
-                        TextInputAction.next,
-                    decoration: _inputDecoration(
-                      label: 'Email',
-                      hint: 'your@email.com',
-                    ),
-                    validator: (value) {
-                      final email =
-                          value?.trim() ?? '';
-
-                      if (email.isEmpty) {
-                        return 'Please enter your email.';
-                      }
-
-                      if (!email.contains('@') ||
-                          !email.contains('.')) {
-                        return 'Please enter a valid email.';
-                      }
-
-                      return null;
-                    },
-                  ),
-
-                  const SizedBox(height: 18),
-
-                  TextFormField(
-                    controller: _phoneController,
-                    style: const TextStyle(
-                      color: Colors.black,
-                    ),
-                    keyboardType:
-                        TextInputType.phone,
-                    textInputAction:
-                        TextInputAction.next,
-                    decoration: _inputDecoration(
-                      label: 'Phone',
-                      hint: '07XXXXXXXX',
-                    ),
-                    validator: (value) {
-                      if (value == null ||
-                          value.trim().isEmpty) {
-                        return 'Please enter your phone number.';
-                      }
-                      return null;
-                    },
-                  ),
-
-                  const SizedBox(height: 18),
-
-                  const Text(
-                    'Event Date',
-                    style: TextStyle(
-                      color: Colors.black87,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-
-                  InkWell(
-                    onTap:
-                        _isSubmitting
-                            ? null
-                            : _selectDate,
-                    borderRadius:
-                        BorderRadius.circular(10),
-                    child: InputDecorator(
-                      decoration: _inputDecoration(
-                        label: 'Select event date',
-                      ),
-                      child: Text(
-                        _selectedDate == null
-                            ? 'Choose a date'
-                            : _formatDate(
-                                _selectedDate!,
-                              ),
+      body: SiteBackground(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 24,
+            vertical: 40,
+          ),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: 850,
+              ),
+              child: Container(
+                padding: const EdgeInsets.all(28),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.88),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Booking',
                         style: TextStyle(
-                          color: _selectedDate == null
-                              ? Colors.black38
-                              : Colors.black,
-                          fontSize: 16,
+                          color: Colors.black,
+                          fontSize: 40,
+                          fontWeight: FontWeight.w800,
                         ),
                       ),
-                    ),
-                  ),
+                      const SizedBox(height: 10),
+                      const Text(
+                        'Send a booking request to Canis Odd.',
+                        style: TextStyle(
+                          color: Colors.black54,
+                          fontSize: 17,
+                        ),
+                      ),
+                      const SizedBox(height: 35),
+                      TextFormField(
+                        controller: _nameController,
+                        style: const TextStyle(
+                          color: Colors.black,
+                        ),
+                        textInputAction: TextInputAction.next,
+                        decoration: _inputDecoration(
+                          label: 'Name',
+                          hint: 'Your full name',
+                        ),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Please enter your name.';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 18),
+                      TextFormField(
+                        controller: _emailController,
+                        style: const TextStyle(
+                          color: Colors.black,
+                        ),
+                        keyboardType: TextInputType.emailAddress,
+                        textInputAction: TextInputAction.next,
+                        decoration: _inputDecoration(
+                          label: 'Email',
+                          hint: 'your@email.com',
+                        ),
+                        validator: (value) {
+                          final email = value?.trim() ?? '';
 
-                  const SizedBox(height: 18),
+                          if (email.isEmpty) {
+                            return 'Please enter your email.';
+                          }
 
-                  DropdownButtonFormField<String>(
-                    initialValue: _selectedEventType,
-                    decoration: _inputDecoration(
-                      label: 'Event Type',
-                    ),
-                    dropdownColor: Colors.white,
-                    style: const TextStyle(
-                      color: Colors.black,
-                    ),
-                    iconEnabledColor: Colors.black,
-                    items: _eventTypes
-                        .map(
-                          (type) =>
-                              DropdownMenuItem<String>(
-                            value: type,
-                            child: Text(type),
+                          if (!email.contains('@') || !email.contains('.')) {
+                            return 'Please enter a valid email.';
+                          }
+
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 18),
+                      TextFormField(
+                        controller: _phoneController,
+                        style: const TextStyle(
+                          color: Colors.black,
+                        ),
+                        keyboardType: TextInputType.phone,
+                        textInputAction: TextInputAction.next,
+                        decoration: _inputDecoration(
+                          label: 'Phone',
+                          hint: '07XXXXXXXX',
+                        ),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Please enter your phone number.';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 18),
+                      const Text(
+                        'Event Date',
+                        style: TextStyle(
+                          color: Colors.black87,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      InkWell(
+                        onTap: _isSubmitting ? null : _selectDate,
+                        borderRadius: BorderRadius.circular(10),
+                        child: InputDecorator(
+                          decoration: _inputDecoration(
+                            label: 'Select event date',
                           ),
-                        )
-                        .toList(),
-                    onChanged: _isSubmitting
-                        ? null
-                        : (value) {
-                            setState(() {
-                              _selectedEventType =
-                                  value;
-                            });
-                          },
-                  ),
-
-                  const SizedBox(height: 18),
-
-                  TextFormField(
-                    controller: _locationController,
-                    style: const TextStyle(
-                      color: Colors.black,
-                    ),
-                    textInputAction:
-                        TextInputAction.next,
-                    decoration: _inputDecoration(
-                      label: 'Event Location',
-                      hint: 'Where will the event take place?',
-                    ),
-                    validator: (value) {
-                      if (value == null ||
-                          value.trim().isEmpty) {
-                        return 'Please enter the event location.';
-                      }
-                      return null;
-                    },
-                  ),
-
-                  const SizedBox(height: 18),
-
-                  TextFormField(
-                    controller: _messageController,
-                    style: const TextStyle(
-                      color: Colors.black,
-                    ),
-                    maxLines: 5,
-                    textInputAction:
-                        TextInputAction.newline,
-                    decoration: _inputDecoration(
-                      label: 'Message',
-                      hint:
-                          'Tell us more about your event...',
-                    ),
-                    validator: (value) {
-                      if (value == null ||
-                          value.trim().isEmpty) {
-                        return 'Please enter a message.';
-                      }
-                      return null;
-                    },
-                  ),
-
-                  const SizedBox(height: 28),
-
-                  SizedBox(
-                    width: double.infinity,
-                    height: 54,
-                    child: ElevatedButton(
-                      onPressed: _isSubmitting
-                          ? null
-                          : _submitBooking,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        foregroundColor: Colors.white,
-                        disabledBackgroundColor:
-                            Colors.black26,
-                        shape:
-                            RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(10),
+                          child: Text(
+                            _selectedDate == null
+                                ? 'Choose a date'
+                                : _formatDate(
+                                    _selectedDate!,
+                                  ),
+                            style: TextStyle(
+                              color: _selectedDate == null
+                                  ? Colors.black38
+                                  : Colors.black,
+                              fontSize: 16,
+                            ),
+                          ),
                         ),
                       ),
-                      child: _isSubmitting
-                          ? const SizedBox(
-                              width: 22,
-                              height: 22,
-                              child:
-                                  CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
+                      const SizedBox(height: 18),
+                      DropdownButtonFormField<String>(
+                        initialValue: _selectedEventType,
+                        decoration: _inputDecoration(
+                          label: 'Event Type',
+                        ),
+                        dropdownColor: Colors.white,
+                        style: const TextStyle(
+                          color: Colors.black,
+                        ),
+                        iconEnabledColor: Colors.black,
+                        items: _eventTypes
+                            .map(
+                              (type) => DropdownMenuItem<String>(
+                                value: type,
+                                child: Text(type),
                               ),
                             )
-                          : const Text(
-                              'SUBMIT BOOKING',
-                              style: TextStyle(
-                                fontWeight:
-                                    FontWeight.bold,
-                                letterSpacing: 0.5,
-                              ),
+                            .toList(),
+                        onChanged: _isSubmitting
+                            ? null
+                            : (value) {
+                                setState(() {
+                                  _selectedEventType = value;
+                                });
+                              },
+                      ),
+                      const SizedBox(height: 18),
+                      TextFormField(
+                        controller: _locationController,
+                        style: const TextStyle(
+                          color: Colors.black,
+                        ),
+                        textInputAction: TextInputAction.next,
+                        decoration: _inputDecoration(
+                          label: 'Event Location',
+                          hint: 'Where will the event take place?',
+                        ),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Please enter the event location.';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 18),
+                      TextFormField(
+                        controller: _messageController,
+                        style: const TextStyle(
+                          color: Colors.black,
+                        ),
+                        maxLines: 5,
+                        textInputAction: TextInputAction.newline,
+                        decoration: _inputDecoration(
+                          label: 'Message',
+                          hint: 'Tell us more about your event...',
+                        ),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Please enter a message.';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 28),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 54,
+                        child: ElevatedButton(
+                          onPressed: _isSubmitting ? null : _submitBooking,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            foregroundColor: Colors.white,
+                            disabledBackgroundColor: Colors.black26,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
                             ),
-                    ),
+                          ),
+                          child: _isSubmitting
+                              ? const SizedBox(
+                                  width: 22,
+                                  height: 22,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : const Text(
+                                  'SUBMIT BOOKING',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                        ),
+                      ),
+                      const SizedBox(height: 50),
+                    ],
                   ),
-
-                  const SizedBox(height: 50),
-                ],
+                ),
               ),
             ),
           ),

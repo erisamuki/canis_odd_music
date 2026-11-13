@@ -3,6 +3,7 @@ import 'package:just_audio/just_audio.dart';
 
 import '../models/music.dart';
 import '../services/api_service.dart';
+import '../widgets/site_background.dart';
 
 class MusicScreen extends StatefulWidget {
   const MusicScreen({super.key});
@@ -126,70 +127,75 @@ class _MusicScreenState extends State<MusicScreen> {
           ),
         ],
       ),
-      body: FutureBuilder<List<Music>>(
-        future: musicFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-
-          if (snapshot.hasError) {
-            return Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text('Unable to load music'),
-                  const SizedBox(height: 12),
-                  ElevatedButton(
-                    onPressed: loadMusic,
-                    child: const Text('Retry'),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          final music = snapshot.data ?? [];
-
-          if (music.isEmpty) {
-            return const Center(
-              child: Text('No music available'),
-            );
-          }
-
-          // Listen to AudioPlayer state changes so the UI
-          // always knows whether the current song is playing.
-          return StreamBuilder<PlayerState>(
-            stream: _audioPlayer.playerStateStream,
-            builder: (context, playerSnapshot) {
-              final playerState = playerSnapshot.data;
-
-              final isPlaying = playerState?.playing ?? false;
-
-              return ListView.builder(
-                padding: const EdgeInsets.all(20),
-                itemCount: music.length,
-                itemBuilder: (context, index) {
-                  final track = music[index];
-
-                  return _MusicCard(
-                    music: track,
-                    isCurrentTrack: currentTrackId == track.id,
-                    isPlaying:
-                        currentTrackId == track.id && isPlaying,
-                    isLoading:
-                        loadingTrack &&
-                        currentTrackId == track.id,
-                    onPlay: () => toggleMusic(track),
-                    audioPlayer: _audioPlayer,
-                  );
-                },
+      body: SiteBackground(
+        child: FutureBuilder<List<Music>>(
+          future: musicFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(),
               );
-            },
-          );
-        },
+            }
+
+            if (snapshot.hasError) {
+              return Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                      'Unable to load music',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    const SizedBox(height: 12),
+                    ElevatedButton(
+                      onPressed: loadMusic,
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            final music = snapshot.data ?? [];
+
+            if (music.isEmpty) {
+              return const Center(
+                child: Text(
+                  'No music available',
+                  style: TextStyle(color: Colors.white),
+                ),
+              );
+            }
+
+            // Listen to AudioPlayer state changes so the UI
+            // always knows whether the current song is playing.
+            return StreamBuilder<PlayerState>(
+              stream: _audioPlayer.playerStateStream,
+              builder: (context, playerSnapshot) {
+                final playerState = playerSnapshot.data;
+
+                final isPlaying = playerState?.playing ?? false;
+
+                return ListView.builder(
+                  padding: const EdgeInsets.all(20),
+                  itemCount: music.length,
+                  itemBuilder: (context, index) {
+                    final track = music[index];
+
+                    return _MusicCard(
+                      music: track,
+                      isCurrentTrack: currentTrackId == track.id,
+                      isPlaying: currentTrackId == track.id && isPlaying,
+                      isLoading: loadingTrack && currentTrackId == track.id,
+                      onPlay: () => toggleMusic(track),
+                      audioPlayer: _audioPlayer,
+                    );
+                  },
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }
@@ -222,20 +228,39 @@ class _MusicCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                Container(
-                  width: 72,
-                  height: 72,
-                  color: Colors.grey.shade900,
-                  child: const Icon(
-                    Icons.music_note,
-                    size: 36,
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: SizedBox(
+                    width: 72,
+                    height: 72,
+                    child: music.coverImage == null || music.coverImage!.isEmpty
+                        ? const ColoredBox(
+                            color: Color(0xFF32230D),
+                            child: Icon(
+                              Icons.graphic_eq_rounded,
+                              size: 36,
+                              color: Color(0xFFD9A441),
+                            ),
+                          )
+                        : Image.network(
+                            ApiService.getFileUrl(music.coverImage!),
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                const ColoredBox(
+                              color: Color(0xFF32230D),
+                              child: Icon(
+                                Icons.graphic_eq_rounded,
+                                size: 36,
+                                color: Color(0xFFD9A441),
+                              ),
+                            ),
+                          ),
                   ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         music.title,
@@ -268,31 +293,24 @@ class _MusicCard extends StatelessWidget {
                           child: CircularProgressIndicator(),
                         )
                       : Icon(
-                          isPlaying
-                              ? Icons.pause_circle
-                              : Icons.play_circle,
+                          isPlaying ? Icons.pause_circle : Icons.play_circle,
                         ),
                 ),
               ],
             ),
-
             if (isCurrentTrack) ...[
               const SizedBox(height: 12),
-
               StreamBuilder<Duration>(
                 stream: audioPlayer.positionStream,
                 builder: (context, positionSnapshot) {
-                  final position =
-                      positionSnapshot.data ?? Duration.zero;
+                  final position = positionSnapshot.data ?? Duration.zero;
 
                   return StreamBuilder<Duration?>(
                     stream: audioPlayer.durationStream,
                     builder: (context, durationSnapshot) {
-                      final duration =
-                          durationSnapshot.data ?? Duration.zero;
+                      final duration = durationSnapshot.data ?? Duration.zero;
 
-                      final max =
-                          duration.inMilliseconds.toDouble();
+                      final max = duration.inMilliseconds.toDouble();
 
                       final value = position.inMilliseconds
                           .clamp(
@@ -311,16 +329,14 @@ class _MusicCard extends StatelessWidget {
                                 ? (newValue) {
                                     audioPlayer.seek(
                                       Duration(
-                                        milliseconds:
-                                            newValue.round(),
+                                        milliseconds: newValue.round(),
                                       ),
                                     );
                                   }
                                 : null,
                           ),
                           Row(
-                            mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
                                 _formatDuration(position),
@@ -344,15 +360,9 @@ class _MusicCard extends StatelessWidget {
   }
 
   String _formatDuration(Duration duration) {
-    final minutes = duration.inMinutes
-        .remainder(60)
-        .toString()
-        .padLeft(2, '0');
+    final minutes = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
 
-    final seconds = duration.inSeconds
-        .remainder(60)
-        .toString()
-        .padLeft(2, '0');
+    final seconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
 
     return '$minutes:$seconds';
   }
